@@ -99,8 +99,7 @@ microcode microprog[512];
 //carrega microprograma
 void load_microprog()
 {
-    //abrindo o microprog.rom
-    FILE *mp = fopen("microprog.rom", "rb");
+        FILE *mp = fopen("microprog.rom", "rb");
     if (mp != NULL)
     {
         fread(microprog, sizeof(microcode), 512, mp);
@@ -112,65 +111,29 @@ void load_microprog()
         exit(-1);
     }
 
-
-//MAIN QUESTAO 10 A e B: (soma da aula 9)
-    // microprog[0] = 0b000000000100001101010000001000010001; //PC <- PC + 1; fetch; GOTO MBR;|- pc=1 e mbr=2;|-pc=3 e mbr=2|- pc=5 e mbr=6
-
-    // //OPC = OPC + memory[end_word]
-    // microprog[2] = 0b000000011000001101010000001000010001; //PC <- PC + 1; fetch;|- pc=2 e mbr=10;|- pc=4 e mbr=11;
-    // microprog[3] = 0b000000100000000101000000000010100010; //MAR <- MBR; read;|- mar=10 e mdr=5|- mar=11 e mdr=4
-    // microprog[4] = 0b000000101000000101001000000000000000; //H <- MDR;|- h=5;|-h=4
-    // microprog[5] = 0b000000000000001111000100000000001000; //OPC <- OPC + H; GOTO MAIN;|- opc=;|-opc=9
-
-    // //memory[end_word] = OPC
-    // microprog[6] = 0b000000111000001101010000001000010001; //PC <- PC + 1; fetch;|-pc=6 e mbr=12
-    // microprog[7] = 0b000001000000000101000000000010000010; //MAR <- MBR;|- mar=12 
-    // microprog[8] = 0b000000000000000101000000000101001000; //MDR <- OPC; write; GOTO MAIN; |-mdr=8 
-
-    // //goto endereco_comando_programa;
-    // microprog[9]  = 0b000001010000001101010000001000010001; //PC <- PC + 1; fetch;
-    // microprog[10] = 0b000000000100000101000000001000010010; //PC <- MBR; fetch; GOTO MBR;
-
-    // //if OPC = 0 goto endereco_comando_programa else goto proxima_linha;
-    // microprog[11]  = 0b000001100001000101000100000000001000; //OPC <- OPC; IF ALU = 0 GOTO 268 (100001100)                                            ELSE GOTO 12 (000001100);
-    // microprog[12]  = 0b000000000000001101010000001000000001; //PC <- PC + 1; GOTO MAIN;
-    // microprog[268] = 0b100001101000001101010000001000010001; //PC <- PC + 1; fetch;
-    // microprog[269] = 0b000000000100000101000000001000010010; //PC <- MBR; fetch; GOTO MBR;
-
-    // //OPC = OPC - memory[end_word];
-    // microprog[13] = 0b000001110000001101010000001000010001; //PC <- PC + 1; fetch;
-    // microprog[14] = 0b000001111000000101000000000010100010; //MAR <- MBR; read;
-    // microprog[15] = 0b000010000000000101001000000000000000; //H <- MDR;
-    // microprog[16] = 0b000000000000001111110100000000001000; //OPC <- OPC - H; GOTO MAIN;
 }
 //carrega programa na memÃ³ria principal para ser executado pelo emulador.
 //programa escrito em linguagem de mÃ¡quina (binÃ¡rio) direto na memÃ³ria principal (array memory declarado mais acima).
 void load_prog()
 {
-    //abrindo o arquivo prog.exe disponibilizado pelo professor.
-    FILE *f = fopen("prog.exe", "rb");
+    FILE *f = fopen("testedaDANI.exe", "rb");
+
     word Q;
-    fread(&Q, sizeof(word), 1, f);
+
+    fread(&Q, sizeof(word), 1, f); //os 4 bytes do cabeçalho
+
     fread(&memory[0], sizeof(byte), 20, f);
+
     word pc;
+
     memcpy(&pc, memory + 12, 4);
+
     fread(memory +pc +1, sizeof(byte), Q-20, f);
+
     fclose;
- 
-    // //AULA 9 : Soma de 5 + 4
-    // memory[0] = 0b00000000;
-    // memory[1] = 0b00000010;
-    // memory[2] = 0b00001010;
-    // memory[3] = 0b00000010;
-    // memory[4] = 0b00001011;
-    // memory[5] = 0b00000110;
-    // memory[6] = 0b00001100;
-    // memory[40] = 0b00000101;
-    // memory[44] = 0b00000100;
-
-
-
 }
+
+
 
 //exibe estado da mÃ¡quina
 void debug(bool clr = true)
@@ -233,20 +196,27 @@ void debug(bool clr = true)
 }
 //Recebe uma microinstru. binária e separa suas partes.
 decoded_microcode decode_microcode(microcode code) 
-{    //implementado
+{   
     decoded_microcode dec;
+
     dec.reg_r = code & 0b1111;
     code = code >> 4;
+
     dec.mem = code & 0b111;
     code = code >> 3;
+
     dec.reg_w = code & 0b111111111;
     code = code >> 9;
+
     dec.alu = code & 0b111111; // ula menos os 2 do sft
     code = code >> 6;
+
     dec.sft = code & 0b11; //SLL8 SRA1, os primeiros 2 da ula
     code = code >> 2;
+
     dec.jam = code & 0b111;
     code = code >> 3;
+
     dec.nadd = code & 0b111111111; //os 9 primeiros espaços para o "next-addres" da microinstrução
     code = code >> 9;
 
@@ -316,7 +286,8 @@ void alu(byte func, word a, word b)
 }
 
 //Deslocamento.
-void shift(byte s, word w) { //considerando a inversão na hora de decodificar os bits de deslocamento "erro"
+void shift(byte s, word w) { 
+  //considerando a inversão na hora de decodificar os bits de deslocamento "erro"
 
     if (s & 0b01){
         w = w << 8;
@@ -358,7 +329,8 @@ void read_registers(byte reg_end) {
 
 //Escrita de registradores.
 void write_register(word reg_end) {  
-    if(reg_end & 0b000000001){
+
+  if(reg_end & 0b000000001){
         mar = bus_c;
     }
 	if(reg_end & 0b000000010){
@@ -403,16 +375,15 @@ void mainmemory_io(byte control){
         aux += (memory[(mar * 4) + 1]);
         aux = aux << 8;
         aux += (memory[(mar * 4) ]);
+        mdr = aux;
     //   for (int i = 3; i<1; i--){
     //     aux += (memory[(mar * 4) + i]);
     //     aux = aux << 8;
     //   }
-        // for (int i = 2; i < 0; i--){
-        //     aux += (memory[(mar * 4) + i]);
-        //     aux = aux << 8;
-        // }
-    
-        mdr = aux;
+    // for (int i = 2; i < 0; i--){
+    //     aux += (memory[(mar * 4) + i]);
+    //     aux = aux << 8;
+    // }  
     }
     if(control & 0b100){ //white
         word mdrWord = mdr; //mdr para palavra
@@ -425,15 +396,16 @@ void mainmemory_io(byte control){
 
 //Define próxima microinstru. a ser executada. 
 word next_address(word next, byte jam) { 
-        if(jam & 0b001){ //jamZ
-            next |= z << 8;
-        }
-        if(jam & 0b010){//jamN
-            next |= n << 8;
-        }
-        if(jam & 0b100){//jamPC
-            next |= mbr;
-        }
+
+    if(jam & 0b001){ //jamZ
+        next |= z << 8;
+    }
+    if(jam & 0b010){//jamN
+        next |= n << 8;
+    }
+    if(jam & 0b100){//jamPC
+        next |= mbr;
+    }
 
     return next;
 }
@@ -448,19 +420,30 @@ int main(int argc, char* argv[]){
     while(!halt)
     {
         debug();
+
         decmcode = decode_microcode(microprog[mpc]);
+
         read_registers(decmcode.reg_r);
+
         alu(decmcode.alu, h, bus_b);
+
         bus_c = alu_out;
+
         shift(decmcode.sft, alu_out);
+
         write_register(decmcode.reg_w);
+
         mainmemory_io(decmcode.mem);
+
         mpc = next_address(decmcode.nadd, decmcode.jam);
-	    getchar();
+
+	      getchar();
+
     }
     
 
     debug(false);
 
     return 0;
+
 }

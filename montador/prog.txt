@@ -1,0 +1,17 @@
+	 bipush 0
+	 istore x
+	 bipush 9
+	 istore y
+loop iload x
+	 bipush 7
+	 iadd
+	 istore x
+	 iload y
+	 bipush 1
+	 isub
+	 istore y
+	 iload y
+	 bipush 0
+	 if_icmpeq fim
+	 goto loop
+fim  nop
