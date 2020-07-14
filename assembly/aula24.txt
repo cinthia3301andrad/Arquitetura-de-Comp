@@ -1,0 +1,28 @@
+org 0x7c00
+bits 16
+mov ax,0
+mov ds,ax
+cli
+
+main:
+    mov si,msg
+    mov ah, 0x0e
+    mov BX, 0xB800
+    mov ES,BX ; [ES:DI]
+    mov DI, 0
+
+.loop:
+    mov al, [DS:SI]
+    inc SI
+    cmp al, 0 
+    jz fim
+    mov [ES:DI], ax
+    add DI,2 ;di +=2
+    jmp .loop
+
+fim:
+    hlt
+msg:
+    db "Hello World"
+times 510 - ($ -$$) db 0
+dw 0xaa55

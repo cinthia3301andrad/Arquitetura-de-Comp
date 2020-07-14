@@ -1,0 +1,41 @@
+org 0x7c00
+bits 16
+mov ax, 0
+mov ds, ax
+cli
+main:
+    mov al, 0x13
+    int 0x10
+    mov ax, 0xA000
+    mov es, ax
+
+    mov ax, 50
+    mov dx, 20
+    mov cl, 55
+    call colorir
+    jmp fim
+
+colorir:
+    push ax
+    push dx
+    push cx
+    push bx
+
+    mov bx, 320
+    push ax; valor da coluna
+    mov ax, dx
+    mul bx; salvo o resultador em ax
+    mov bx, ax
+    pop ax
+    add ax, bx
+    mov di, ax
+    mov [es:di], cl
+    pop bx
+    pop cx
+    pop dx
+    pop ax
+    ret
+fim:
+    hlt
+    times 510 - ($-$$) db 0
+    dw 0xaa55

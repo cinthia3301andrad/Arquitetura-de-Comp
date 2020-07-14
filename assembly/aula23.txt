@@ -1,0 +1,89 @@
+ 1) 
+ org 0x7c00
+ bits 16
+ mov ax, 0
+ mov ds, ax
+ cli
+main:
+ mov si, msg
+ mov ah, 0x0e
+.loop:
+ lodsb
+ or al, al
+ jz fim
+ int 0x10
+ jmp .loop
+fim:
+ hlt
+msg:
+ db "hello world!"
+ times 510 - ($-$$) db 0
+ db 0x55 ;resposta
+ db 0xaa ;resposta
+2)
+ resposta: 477 vezes
+3)
+ org 0x7c00
+ bits 16
+ mov ax, 0
+ mov ds, ax
+ cli
+main:
+ mov si, msg
+ mov ah, 0x0e
+.loop:
+ lodsb
+ cmp al, 0 //resposta o
+ jz fim
+ int 0x10
+ jmp .loop
+fim:
+ hlt
+msg:
+ db "hello world!"
+ times 510 - ($-$$) db 0
+ dw 0xaa55
+
+4)
+ org 0x7c00
+ bits 16
+ mov ax, 0
+ mov ds, ax
+ cli
+main:
+ mov si, msg
+ mov ah, 0x0e
+.loop:
+ lodsb
+ or al, al
+ jz fim
+ int 0x10
+ jmp .loop
+fim:
+ hlt
+msg:
+ db 'O','l', 0xA0,' ','m','u','n','d','o','!' ;resposta
+ times 510 - ($-$$) db 0
+ dw 0xaa55
+
+5)
+ org 0x7c00
+ bits 16
+ mov ax, 0
+ mov ds, ax
+ cli
+main:
+ mov si, msg
+ mov ah, 0x0e
+.loop:
+ lodsb
+ or al, al
+ jz fim
+ int 0x10
+ jmp .loop
+fim:
+ hlt
+msg:
+ db 'H','e','l','l','o',0xA,13,0xA,'W','o','r','l','d','!' ;resposta
+ times 510 - ($-$$) db 0
+ dw 0xaa55

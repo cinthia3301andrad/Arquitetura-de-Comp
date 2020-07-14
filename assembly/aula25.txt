@@ -1,0 +1,41 @@
+org 0x7c00
+bits 16
+mov ax, 0
+mov ds, ax
+cli
+main:
+    mov ax, 1924
+    call printi
+    jmp fim
+
+printi:
+    mov cx, 10
+    mov bl, 0
+
+.loop:
+    mov dx, 0
+    div cx
+    push dx
+    inc bl
+    cmp ax, 0
+
+    jz .pilha
+    jmp .loop
+
+.pilha:
+    pop dx
+    dec bl
+    mov al, dl
+    mov ah, 0x0e
+    add al, 48
+    int 0x10
+    or bl, bl
+    jz .retorne
+    jmp .pilha
+    
+.retorne:
+    ret
+fim:
+    hlt
+    times 510 - ($-$$) db 0
+    dw 0xaa55

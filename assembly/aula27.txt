@@ -1,0 +1,56 @@
+ org 0x7c00
+ bits 16
+ mov ax, 0
+ mov ds, ax
+ mov ax, perg
+ call prints
+ mov ax, 0x7e00 ; gravar a string nessa posição de memória
+ call gets
+ mov ax, respi
+ call prints
+ mov ax, 0x7e00
+ call prints
+ mov ax, respf
+ call prints
+
+ jmp fim
+gets: 
+ push ax
+ push di
+ mov di, ax ; indica o endereço de gravação de cada caractere
+.loop2: 
+ mov ah, 0 ; executa a função "leia teclado"
+ int 0x16  ;leitura de string, byte da tecla pressionada para o AL
+ cmp al, 13 ; compara a tecla pressionada com enter(13)
+ je .ret2
+ mov [ds:di], al
+ inc di
+ mov ah, 0x0e
+ int 0x10
+ jmp .loop2
+.ret2: 
+ mov ah, 0x0e
+ int 0x10
+ mov al, 10
+ int 0x10
+ mov [ds:di], byte 0
+ pop di
+ pop ax
+ ret
+prints: push ax
+ push si
+ mov si, ax
+ mov ah, 0x0e
+.loop1: lodsb
+ or al, al
+ jz .ret1
+ int 0x10
+ jmp .loop1
+.ret1: pop si
+ pop ax
+ ret
+fim: hlt
+perg: db "Oi! Qual o seu nome?", 10, 13, 0
+respi: db "Ola, ", 0
+respf: db "!", 10 , 13, 0
+ times 510 
